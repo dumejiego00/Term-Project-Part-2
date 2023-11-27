@@ -9,10 +9,7 @@
       "following": 30
     },
     "profile": "profile.jpeg",
-    "photos": [
-      "pic1.png",
-      "pic2.png"
-    ]
+    "photos": ["pic1.png", "pic2.png"]
   },
   {
     "id": "cb506c7d-1c2f-4ce8-a56f-d45f16bf34cf",
@@ -24,9 +21,6 @@
       "following": 30
     },
     "profile": "profile.jpeg",
-    "photos": [
-      "pic1.png",
-      "pic2.png"
-    ]
+    "photos": ["pic1.png", "pic2.png"]
   }
 ]

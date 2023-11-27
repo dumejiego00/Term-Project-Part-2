@@ -1,11 +1,151 @@
 const fs = require("fs");
+const { readFile } = require("fs/promises");
 const { DEFAULT_HEADER } = require("./util/util");
 const path = require("path");
 var qs = require("querystring");
+var formidable = require("formidable");
+const handler = require("./handler.js");
 
 const controller = {
   getHomePage: async (request, response) => {
-    return response.end(`<h1>Hahahahahahahahah</h1`);
+    const data = await readFile("./database/data.json");
+    const users = JSON.parse(data);
+    let out = `<style>
+    * {
+    padding: 0;
+    margin: 0;
+  }
+  
+  #navigation {
+    background-color: white;
+    width: 100%;
+    height: 70px;
+  }
+
+  #logo{
+    width:50px;
+    margin-top:10px;
+    margin-left:30px;
+  }
+  
+  body {
+    background-color: rgb(221, 221, 221);
+  }
+  
+  h1 {
+    font-family: "Roboto", sans-serif;
+    margin-top: 25px;
+    margin-left:50px;
+  }
+  
+  #user_background {
+    background-color: white;
+    width: 220px;
+    height: 125px;
+    display: flex;
+    justify-content: center;
+    border-radius: 8px;
+    margin: 20px 0px 20px 50px;
+  }
+  
+  .photo_n_buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .profile_photo {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+  }
+  
+  .buttons {
+    margin-left: 10px;
+  }
+  
+  .button {
+    width: 60px;
+    height: 25px;
+    background-color: black;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 65%;
+    text-decoration: none;
+    border: none;
+  }
+  
+  .upload {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  #upload_button{
+    width: 50px;
+    height: 15px;
+    background-color: black;
+    color: white;
+    padding: 5px 5px 8px 5px;
+    border-radius: 4px;
+    margin-bottom:5px;
+  }
+  
+    </style>
+    <div id="navigation">
+      <img
+        src="/src/photos/imgHtml/insta_icon.png"
+        alt="instagram_icon"
+        id="logo"
+      />
+    </div>
+    <div><h1>Users</h1><div>
+    `;
+    for (const user of users) {
+      out += `
+      
+        <div id="user_background">
+          <div class="photo_n_buttons">
+            <div>
+              <img class="profile_photo" src="src/photos/${user.username}/${user.profile}" alt="${user.name}" />
+              
+            </div>
+            <div class="buttons">
+              <div>
+              <form action="images" method="post" enctype="multipart/form-data">
+              <div id="upload_button">
+                <label for="files_${user.username}" class="upload_button_label">Upload</label>
+                <input
+                  id="files_${user.username}"
+                  type="file"
+                  onchange="this.form.submit()"
+                  name="myFile"
+                  accept=".apng, .avif, .gif, .jpg, .jpeg, .png, .svg, .webp"
+                  style="visibility: hidden"
+                />
+              </div>
+            </form>
+              </div>
+              <div>
+                <button class="button" type="button">${user.username}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        `;
+    }
+    out += `<script>
+        const files = document.getElementsByTagName("input");
+
+      const fileSubmitted = e => {
+        console.log(e.target.id);
+      }
+
+      for(let file of files){
+        file.addEventListener('input',fileSubmitted);
+      }
+        </script>`;
+    return response.end(out);
   },
   getFormPage: (request, response) => {
     return response.end(`
@@ -685,8 +825,27 @@ const controller = {
     `);
     response.end();
   },
+  sendImages: (request, response) => {
+    fs.createReadStream("." + request.url).pipe(response);
+  },
+  uploadImages: (request, response) => {
+    var form = new formidable.IncomingForm();
 
-  uploadImages: (request, response) => {},
+    form.parse(request, function (err, fields, files) {
+      const file = files.myFile[0];
+      const originalPath = file.filepath;
+      const newPath = path.join(__dirname, "photos", file.originalFilename);
+
+      fs.rename(originalPath, newPath, (err) => {
+        if (err) {
+          console.log(err.message);
+        }
+      });
+    });
+    request.url = "/";
+    console.log(request.url);
+    controller.getHomePage(request, response);
+  },
 };
 
 module.exports = controller;

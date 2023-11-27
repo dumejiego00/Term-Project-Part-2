@@ -22,8 +22,9 @@ const allRoutes = {
   "/feed:get": (request, response) => {
     controller.getFeed(request, response);
   },
-
-  // 404 routes
+  sendImg: (request, response) => {
+    controller.sendImages(request, response);
+  },
   default: (request, response) => {
     response.writeHead(404, DEFAULT_HEADER);
     createReadStream(path.join(__dirname, "views", "404.html"), "utf8").pipe(
@@ -32,10 +33,25 @@ const allRoutes = {
   },
 };
 
+function imgChecker(requestPath) {
+  const splitPath = requestPath.split(".");
+  const format = ["apng", "avif", "gif", "jpg", "jpeg", "png", "svg", "webp"];
+  if (format.includes(splitPath[splitPath.length - 1])) {
+    return true;
+  }
+  return false;
+}
+
 function handler(request, response) {
   const { url, method } = request;
 
   const { pathname } = parse(url, true);
+
+  if (imgChecker(pathname)) {
+    return Promise.resolve(allRoutes.sendImg(request, response)).catch(
+      handlerError(response)
+    );
+  }
 
   const key = `${pathname}:${method.toLowerCase()}`;
   const chosen = allRoutes[key] || allRoutes.default;

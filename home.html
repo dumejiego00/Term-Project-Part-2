@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+
+      #navigation {
+        background-color: white;
+        width: 100%;
+        height: 70px;
+      }
+
+      #content {
+        margin: 20px 50px;
+      }
+
+      body {
+        background-color: rgb(221, 221, 221);
+      }
+
+      h1 {
+        font-family: "Roboto", sans-serif;
+      }
+
+      #user_background {
+        background-color: white;
+        width: 220px;
+        height: 125px;
+        display: flex;
+        justify-content: center;
+        border-radius: 8px;
+        margin: 20px 0px 20px 0px;
+      }
+
+      .photo_n_buttons {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .profile_photo {
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+      }
+
+      .buttons {
+        margin-left: 10px;
+      }
+
+      .button {
+        width: 60px;
+        height: 25px;
+        background-color: black;
+        color: white;
+        padding: 5px;
+        border-radius: 4px;
+        font-size: 50%;
+        text-decoration: none;
+        border: none;
+      }
+
+      .upload {
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+
+      #upload_button {
+        width: 50px;
+        height: 20px;
+        background-color: black;
+        color: white;
+        padding: 5px;
+        border-radius: 4px;
+      }
+    </style>
+    
+  </head>
+  <body>
+    
+    <div id="navigation">
+      <img
+        src="/src/photos/imgHtml/insta_icon.png"
+        alt="instagram_icon"
+        width="70px"
+      />
+    </div>
+    <div id="content">
+      <div><h1>Users</h1></div>
+      <div id="users"></div>
+      <form action="fileupload" method="post" enctype="multipart/form-data">
+        <div id="upload_button">
+          <label for="files/japa_dawg" class="upload_button_label"
+            >Upload</label
+          >
+          <input
+            id="files/japa_dawg"
+            type="file"
+            name="myFile"
+            accept=".apng, .avif, .gif, .jpg, .jpeg, .png, .svg, .webp"
+            style="visibility: hidden"
+          />
+        </div>
+        <div id="upload_button">
+          <label for="files/japa_cat" class="upload_button_label"
+            >Upload</label
+          >
+          <input
+            id="files/japa_cat"
+            type="file"
+            name="myFile"
+            accept=".apng, .avif, .gif, .jpg, .jpeg, .png, .svg, .webp"
+            style="visibility: hidden"
+          />
+        </div>
+      </form>
+    </div>
+    <script>
+      
+      const files = document.getElementsByTagName("input");
+
+      const fileSubmitted = e => {
+        console.log(e.target.id);
+      }
+
+      for(let file of files){
+        file.addEventListener('input',fileSubmitted);
+      }
+    </script>
+  </body>
+</html>
