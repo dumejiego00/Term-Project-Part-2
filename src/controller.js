@@ -5,6 +5,7 @@ const path = require("path");
 var qs = require("querystring");
 var formidable = require("formidable");
 const handler = require("./handler.js");
+const querystring = require("querystring");
 
 const controller = {
   getHomePage: async (request, response) => {
@@ -112,7 +113,7 @@ const controller = {
             </div>
             <div class="buttons">
               <div>
-              <form action="images" method="post" enctype="multipart/form-data">
+              <form action="/images?username=${user.username}" method="post" enctype="multipart/form-data">
               <div id="upload_button">
                 <label for="files_${user.username}" class="upload_button_label">Upload</label>
                 <input
@@ -134,17 +135,7 @@ const controller = {
         </div>
         `;
     }
-    out += `<script>
-        const files = document.getElementsByTagName("input");
 
-      const fileSubmitted = e => {
-        console.log(e.target.id);
-      }
-
-      for(let file of files){
-        file.addEventListener('input',fileSubmitted);
-      }
-        </script>`;
     return response.end(out);
   },
   getFormPage: (request, response) => {
@@ -830,21 +821,45 @@ const controller = {
   },
   uploadImages: (request, response) => {
     var form = new formidable.IncomingForm();
-
     form.parse(request, function (err, fields, files) {
-      const file = files.myFile[0];
-      const originalPath = file.filepath;
-      const newPath = path.join(__dirname, "photos", file.originalFilename);
-
-      fs.rename(originalPath, newPath, (err) => {
-        if (err) {
-          console.log(err.message);
-        }
-      });
+      if (err) {
+        console.log(err.msg);
+      } else {
+        let query = request.url.split("?");
+        let qString = query[1];
+        const parameter = querystring.decode(qString);
+        const file = files.myFile[0];
+        const originalPath = file.filepath;
+        const newPath = path.join(
+          __dirname,
+          "photos",
+          parameter.username,
+          file.originalFilename
+        );
+        fs.rename(originalPath, newPath, (err) => {
+          if (err) {
+            console.log(err.msg);
+          }
+        });
+        fs.readFile("database/data.json", (err, data) => {
+          if (err) {
+            console.log(err.msg);
+          } else {
+            let users = JSON.parse(data);
+            for (let user of users) {
+              if (user.username === parameter.username) {
+                user.photos.push(file.originalFilename);
+              }
+            }
+            fs.writeFile("database/data.json", JSON.stringify(users), (err) => {
+              if (err) {
+                console.log(err);
+              }
+            });
+          }
+        });
+      }
     });
-    request.url = "/";
-    console.log(request.url);
-    controller.getHomePage(request, response);
   },
 };
 
