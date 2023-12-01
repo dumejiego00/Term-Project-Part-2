@@ -3,7 +3,6 @@ const { DEFAULT_HEADER } = require("./util/util.js");
 const controller = require("./controller");
 const { createReadStream } = require("fs");
 const path = require("path");
-const querystring = require("querystring");
 
 const allRoutes = {
   // GET: localhost:3000/
